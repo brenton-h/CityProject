@@ -15,7 +15,8 @@ public class RagdollCharacter : MonoBehaviour
 	void Start () {
 		// locate GameObject tagged "Respawn"
 		spawnPoint = GameObject.FindWithTag("Respawn").transform;
-        PlayerSource = GameObject.FindGameObjectWithTag("Player").GetComponent<AudioSource>();
+        //PlayerSource = GameObject.FindGameObjectWithTag("Player").GetComponent<AudioSource>();
+        PlayerSource = GetComponent<AudioSource>();
 		// deactive the ragdoll, and respawn player
 	    DeactivateRagdoll();
     }
@@ -23,7 +24,7 @@ public class RagdollCharacter : MonoBehaviour
 	/**
 	 * turn on ragdoll physics
 	 */
-	public void ActivateRagdoll()
+	public void ActivateRagdoll(bool restore=true)
 	{
         PlayerSource.PlayOneShot(DeathSound);
         // Disable Character Controller component
@@ -33,7 +34,7 @@ public class RagdollCharacter : MonoBehaviour
 		SetActiveRagdoll(true);
 		
 		// Start coroutine to restore character after a few seconds
-		StartCoroutine (Restore ());
+		if (restore) StartCoroutine(Restore());
 	}
 
 	/**

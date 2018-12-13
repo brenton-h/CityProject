@@ -64,6 +64,7 @@ public class Explode : MonoBehaviour {
 		foreach (Collider col in colliders) {
 			// Get Rigidbody component of game object
 			Rigidbody rb = col.GetComponent<Rigidbody>();
+
             deadlyObject.HitObject(col);
 
             if (rb != null)

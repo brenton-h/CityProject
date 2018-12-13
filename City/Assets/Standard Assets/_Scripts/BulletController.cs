@@ -29,20 +29,40 @@ public class BulletController : MonoBehaviour {
         rb.AddForce(dir * force);
         rb.velocity.Set(rb.velocity.x, rb.velocity.y, rb.velocity.z);
             if (Vector3.Distance(transform.position, Destination) < 1f) {
-                DestroySelf();
+                //DestroySelf();
             }
         
 	}
 
     void OnCollisionEnter(Collision c) {
-        DestroySelf();
+        print("hit");
+        if (c.gameObject.tag == "Car") {
+            try {
+                ExplosiveCar ec = c.gameObject.GetComponent<ExplosiveCar>();
+                if (ec.health <= 1) {
+                    ec.StartSequence(3f);
+                } else ec.health--;
+            } catch (System.NullReferenceException) { }
+        } else if (c.gameObject.tag != "Player") {
+            PhysicMaterial p = c.collider.material;
+            string m = p.name;
+            m = m.ToLower().Split(' ')[0];
+            if (m == "road") {
+                //print("Hit a road");
+            } else if (m == "brick") {
+            } else if (m == "stone") {
+            } else if (m == "grass") {
+            } else if (m == "dirt") {
+            } else if (m == "") {
+            }
+        } DestroySelf();        
     }
 
-    public void DestroySelf(int delay=-1) {
+    public void DestroySelf(float delay=-1) {
         try {
             if (delay <= 0) {
-                Destroy(gameObject);
-                GameObject.FindGameObjectWithTag("Player").GetComponent<MouseAim>().flashMuzzle(transform.position);
+                print("Bullet destroyed");
+                Destroy(gameObject, .05f);
             } else Destroy(gameObject, delay);
         } catch (System.NullReferenceException) { print("Bullet destroyed"); }
     }

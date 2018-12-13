@@ -83,11 +83,11 @@ public class BasicController2 : MonoBehaviour {
             if (v != 0 && !moveDiagonally) xSpeed = 0f;
 
             if (v != 0 && keyboardRotate) {
-                this.transform.Rotate(Vector3.up * h, Space.World);
+                transform.Rotate(Vector3.up * h, Space.World);
             }
 
             if (mouseRotate) {
-                this.transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Mathf.Sign(v), Space.World);
+                transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Mathf.Sign(v), Space.World);
             }
 
             animator.SetFloat("zSpeed", zSpeed, transitionTime, Time.deltaTime);
@@ -109,28 +109,29 @@ public class BasicController2 : MonoBehaviour {
                 animator.SetBool("Grenade", threwObject);
                 //Invoke("RePositionRifle", 3f);
             }
-            if (FullAuto) {
-                if (Input.GetButtonDown("Fire1")) animator.SetBool("Fire", true);
-                if (Input.GetButton("Fire1")) {
-                    if (Reloaded) {
+            if (Player.HasWeapon && Reloaded) {
+                if (Player.Weapon.FireMode == FiringMode.FullAuto) {
+                    if (Input.GetButton("Fire1")) {
+                        animator.SetBool("Fire", true);
+                        Player.Weapon.Fire(Bullet);
                         Reloaded = false;
-                        if (HasRifle) Aim.FireBullet(Bullet);
-                        Invoke("Reload", 0.2f);
-
+                        Invoke("Reload", Player.Weapon.FireRate);
+                    } else animator.SetBool("Fire", false);
+                } else {
+                    if (Input.GetButtonDown("Fire1")) {
+                        animator.SetBool("Fire", true);
+                        Player.Weapon.Fire(Bullet);
+                        Reloaded = false;
+                        Invoke("Reload", Player.Weapon.FireRate);
                     }
-                    
+                    if (Input.GetButtonUp("Fire1")) { animator.SetBool("Fire", false); }
                 }
-                if (Input.GetButtonUp("Fire1")) { animator.SetBool("Fire", false); }
-            } else {
-                if (Input.GetButtonDown("Fire1")) {
-                    animator.SetBool("Fire", true);
-                    if (HasRifle) Aim.FireBullet(Bullet);
-                }
-                if (Input.GetButtonUp("Fire1")) { animator.SetBool("Fire", false); }
             }
             
         }
-    }
 
+        
+    }
+    void StopFiring() { animator.SetBool("Fire", false); }
     void Reload() { Reloaded = true; }
 }

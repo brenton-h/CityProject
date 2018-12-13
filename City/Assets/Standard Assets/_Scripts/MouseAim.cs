@@ -1,21 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 public class MouseAim : MonoBehaviour {
+    
+
     public AudioClip GunShot;
+
     public GameObject MuzzleFlash;
+
     public Transform spine;
     public Transform weapon;
+
     public GameObject crosshairImage;
+
     public Vector2 xLimit = new Vector2(-40f, 40f);
     public Vector2 yLimit = new Vector2(-40f, 40f);
-    private float xAxis = 0f;
-    private float yAxis = 0f;
+
+    private float xAxis = 0f, yAxis = 0f;
 
     public Transform ShootPoint { get; set; }
     private GameObject player;
     private BasicController2 bc2;
-    private Vector3 fromPosition, Destination;
-    
+    private Vector3 fromPosition;
+
+    public static Vector3 Direction { get; set; }
+    public static Vector3 Destination { get; set; }
+
+
+    void Awake() {
+        Weapon.MuzzleFlash = MuzzleFlash;
+        Weapon.GunShot = GunShot;
+    }
+
     void Start() {
         MuzzleFlash.transform.localScale *= 0.1f;
         player = GameObject.FindGameObjectWithTag("Player");
@@ -24,7 +39,7 @@ public class MouseAim : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        if (bc2.HasRifle) {
+        if (Player.HasWeapon) {
             RotateSpine();
             ShowCrosshairIfRaycastHit();
         }
@@ -40,18 +55,21 @@ public class MouseAim : MonoBehaviour {
     }
 
     private void ShowCrosshairIfRaycastHit() {
-        Vector3 weaponForwardDirection = weapon.TransformDirection(Vector3.forward);
+        //Vector3 weaponForwardDirection = weapon.TransformDirection(Vector3.forward);
+        //Vector3 forwardDirection = Player.Weapon.Transform.TransformDirection(Player.Weapon.WeaponForward);
         RaycastHit raycastHit;
-        fromPosition = weapon.position + Vector3.one;
-        if (Physics.Raycast(fromPosition, weaponForwardDirection, out raycastHit)) {
+        fromPosition = Player.Weapon.Position + Vector3.one;
+        if (Physics.Raycast(Player.Weapon.ShootPoints[1].position, Player.Weapon.Direction, out raycastHit)) {
             Vector3 hitLocation = Camera.main.WorldToScreenPoint(raycastHit.point);
             Destination = hitLocation;
-            BulletController.Direction = (raycastHit.point - weapon.position).normalized;
+            BulletController.Direction = Player.Weapon.Direction;// (raycastHit.point - Player.Weapon.Position).normalized;
+            Direction = Player.Weapon.Direction;// (raycastHit.point - Player.Weapon.Position).normalized;
             DisplayPointerImage(hitLocation);
         } else {
             Destination = Vector3.negativeInfinity;
             crosshairImage.SetActive(false);
-            BulletController.Direction = weaponForwardDirection;
+            BulletController.Direction = Player.Weapon.Direction;
+            Direction = Player.Weapon.Direction;
         }
         /*Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit raycastHit;
@@ -67,16 +85,16 @@ public class MouseAim : MonoBehaviour {
     }
 
     public void FireBullet(GameObject Bullet) {
-        weapon.GetComponent<AudioSource>().PlayOneShot(GunShot);
+        
+        Player.Weapon.GameObject.GetComponent<AudioSource>().PlayOneShot(GunShot);
         //new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z + 0.5f)
         
-        GameObject bulletInstance = Instantiate(Bullet, ShootPoint.position,
-            player.transform.rotation);
-
+        GameObject bulletInstance = Instantiate(Bullet, Player.Weapon.ShootPoint.position,
+            Player.Transform.rotation);
+       
         bulletInstance.GetComponent<BulletController>().Destination = Destination;
-
-        flashMuzzle(ShootPoint.position);
         
+        flashMuzzle(Player.Weapon.ShootPoint.position);
         //Vector3 dir = bullet.GetComponent<BulletController>().Direction;
         bulletInstance.GetComponent<Rigidbody>().AddForce(500f * BulletController.Direction);
         bulletInstance.GetComponent<BulletController>().DestroySelf(3);

@@ -34,7 +34,13 @@ public class DeadlyObject : MonoBehaviour
             RagdollCharacter ragdollCharacter = hit.gameObject.GetComponent<RagdollCharacter>();
 			ExplodePlayer(ragdollCharacter);
 			//Destroy(gameObject);
-		}
+		} else {
+            ExplosiveCar ec;
+            try {
+                ec = hit.gameObject.GetComponent<ExplosiveCar>();
+                ec.StartSequence(.25f, false);
+            } catch (System.NullReferenceException) { }
+        }
 	}
 
     public void HitObject(Collider hit) { OnTriggerEnter(hit); }

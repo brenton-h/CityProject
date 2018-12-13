@@ -11,8 +11,8 @@ namespace UnityStandardAssets.Utility
         // then shuts off emission, and waits for all particles to expire
         // before destroying the gameObject
 
-        public float minDuration = 8;
-        public float maxDuration = 10;
+        public float minDuration = 300;
+        public float maxDuration = 600;
 
         private float m_MaxLifetime;
         private bool m_EarlyStop;
